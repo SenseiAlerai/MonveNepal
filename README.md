@@ -47,11 +47,17 @@ Change this before going live.
 Create `.env` on the VPS:
 
 ```text
-PORT=3000
+PORT=3001
 SESSION_SECRET=replace-with-a-long-random-secret
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=replace-with-a-strong-password
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
+CLOUDINARY_FOLDER=monve-nepal
 ```
+
+Cloudinary is optional in local development. If the Cloudinary values are missing, uploads are saved in `uploads/`. On the VPS, set the Cloudinary values so admin uploads are stored on Cloudinary.
 
 Install and run:
 
@@ -78,7 +84,7 @@ server {
     client_max_body_size 10M;
 
     location / {
-        proxy_pass http://127.0.0.1:3000;
+        proxy_pass http://127.0.0.1:3001;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -90,11 +96,16 @@ server {
 
 ## Backups
 
-Back up these two paths:
+If using Cloudinary, uploaded images live in Cloudinary and only the CMS data file needs regular backup:
 
 ```text
 data/monve-db.json
+```
+
+If Cloudinary is not configured, also back up:
+
+```text
 uploads/
 ```
 
-The source code can be redeployed from GitHub, but those two paths contain the client's live content and uploaded images.
+The source code can be redeployed from GitHub, but `data/monve-db.json` contains the client's live content and image URLs.

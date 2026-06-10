@@ -7,6 +7,7 @@ const express = require("express");
 const session = require("express-session");
 const multer = require("multer");
 const bcrypt = require("bcryptjs");
+const { v2: cloudinary } = require("cloudinary");
 
 const app = express();
 const root = __dirname;
@@ -17,6 +18,20 @@ const port = Number(process.env.PORT || 3000);
 
 fs.mkdirSync(dataDir, { recursive: true });
 fs.mkdirSync(uploadDir, { recursive: true });
+
+const cloudinaryEnabled = Boolean(
+  process.env.CLOUDINARY_CLOUD_NAME &&
+  process.env.CLOUDINARY_API_KEY &&
+  process.env.CLOUDINARY_API_SECRET
+);
+
+if (cloudinaryEnabled) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+  });
+}
 
 function slugify(value) {
   return String(value)
@@ -109,7 +124,7 @@ function publicPayload(includeHidden = false) {
   return { settings: data.settings, categories, bags };
 }
 
-const storage = multer.diskStorage({
+const localStorage = multer.diskStorage({
   destination: uploadDir,
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${crypto.randomBytes(5).toString("hex")}${path.extname(file.originalname).toLowerCase()}`);
@@ -117,7 +132,7 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({
-  storage,
+  storage: cloudinaryEnabled ? multer.memoryStorage() : localStorage,
   limits: { fileSize: 8 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (!/^image\/(png|jpe?g|webp|gif)$/i.test(file.mimetype)) {
@@ -127,6 +142,30 @@ const upload = multer({
     cb(null, true);
   }
 });
+
+function localUploadUrl(file) {
+  return file ? `/uploads/${file.filename}` : "";
+}
+
+function uploadBufferToCloudinary(file) {
+  if (!file) return Promise.resolve("");
+  if (!cloudinaryEnabled) return Promise.resolve(localUploadUrl(file));
+
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream({
+      folder: process.env.CLOUDINARY_FOLDER || "monve-nepal",
+      resource_type: "image",
+      overwrite: false
+    }, (error, result) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve(result.secure_url);
+    });
+    stream.end(file.buffer);
+  });
+}
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -169,15 +208,21 @@ app.get("/api/admin/data", requireAdmin, (req, res) => res.json(publicPayload(tr
 app.put("/api/admin/settings", requireAdmin, upload.fields([
   { name: "heroImageFile", maxCount: 1 },
   { name: "storyImageFile", maxCount: 1 }
-]), (req, res) => {
+]), async (req, res, next) => {
+  try {
   const data = readDb();
   ["announcement", "heroEyebrow", "heroTitle", "heroText", "storyEyebrow", "storyTitle", "storyText"].forEach((key) => {
     data.settings[key] = String(req.body[key] || "");
   });
-  if (req.files?.heroImageFile?.[0]) data.settings.heroImage = `/uploads/${req.files.heroImageFile[0].filename}`;
-  if (req.files?.storyImageFile?.[0]) data.settings.storyImage = `/uploads/${req.files.storyImageFile[0].filename}`;
+  const heroImage = await uploadBufferToCloudinary(req.files?.heroImageFile?.[0]);
+  const storyImage = await uploadBufferToCloudinary(req.files?.storyImageFile?.[0]);
+  if (heroImage) data.settings.heroImage = heroImage;
+  if (storyImage) data.settings.storyImage = storyImage;
   writeDb(data);
   res.json(publicPayload(true));
+  } catch (error) {
+    next(error);
+  }
 });
 
 app.post("/api/admin/categories", requireAdmin, (req, res) => {
@@ -216,10 +261,12 @@ app.delete("/api/admin/categories/:id", requireAdmin, (req, res) => {
   res.json(publicPayload(true));
 });
 
-app.post("/api/admin/bags", requireAdmin, upload.single("image"), (req, res) => {
+app.post("/api/admin/bags", requireAdmin, upload.single("image"), async (req, res, next) => {
+  try {
   const data = readDb();
   const name = String(req.body.name || "").trim();
   if (!name) return res.status(400).json({ error: "Bag name is required" });
+  const imageUrl = await uploadBufferToCloudinary(req.file);
   data.bags.push({
     id: data.nextBagId++,
     name,
@@ -227,7 +274,7 @@ app.post("/api/admin/bags", requireAdmin, upload.single("image"), (req, res) => 
     color: req.body.color || "",
     tag: req.body.tag || "",
     description: req.body.description || "",
-    imageUrl: req.file ? `/uploads/${req.file.filename}` : "/assets/catalog-bags.png",
+    imageUrl: imageUrl || "/assets/catalog-bags.png",
     sort_order: Number(req.body.sortOrder || 0),
     visible: req.body.visible === "0" ? 0 : 1,
     created_at: new Date().toISOString(),
@@ -235,9 +282,13 @@ app.post("/api/admin/bags", requireAdmin, upload.single("image"), (req, res) => 
   });
   writeDb(data);
   res.json(publicPayload(true));
+  } catch (error) {
+    next(error);
+  }
 });
 
-app.put("/api/admin/bags/:id", requireAdmin, upload.single("image"), (req, res) => {
+app.put("/api/admin/bags/:id", requireAdmin, upload.single("image"), async (req, res, next) => {
+  try {
   const data = readDb();
   const bag = data.bags.find((item) => item.id === Number(req.params.id));
   if (!bag) return res.status(404).json({ error: "Bag not found" });
@@ -246,12 +297,16 @@ app.put("/api/admin/bags/:id", requireAdmin, upload.single("image"), (req, res) 
   bag.color = req.body.color || "";
   bag.tag = req.body.tag || "";
   bag.description = req.body.description || "";
-  if (req.file) bag.imageUrl = `/uploads/${req.file.filename}`;
+  const imageUrl = await uploadBufferToCloudinary(req.file);
+  if (imageUrl) bag.imageUrl = imageUrl;
   bag.sort_order = Number(req.body.sortOrder || 0);
   bag.visible = req.body.visible === "0" ? 0 : 1;
   bag.updated_at = new Date().toISOString();
   writeDb(data);
   res.json(publicPayload(true));
+  } catch (error) {
+    next(error);
+  }
 });
 
 app.delete("/api/admin/bags/:id", requireAdmin, (req, res) => {
