@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MONVE NEPAL | Bags Made for Every Day</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="announcement">New arrivals added monthly - browse the latest collection</div>
+
+  <header class="site-header">
+    <button class="icon-button menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <a class="brand logo-brand" href="#">
+      <img src="assets/monve-logo.png" alt="Monve Nepal logo">
+      <span>MONVE NEPAL</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="#new">New In</a>
+      <a href="#catalog">Catalog</a>
+      <a href="#collections">Collections</a>
+      <a href="#story">Our Story</a>
+    </nav>
+    <div class="header-actions">
+      <button class="action-button search-toggle" type="button">Search</button>
+      <a class="action-button inquiry-link" href="#inquiry">Inquire</a>
+    </div>
+  </header>
+
+  <aside class="mobile-panel" aria-hidden="true">
+    <a href="#new">New In</a>
+    <a href="#catalog">Catalog</a>
+    <a href="#collections">Collections</a>
+    <a href="#story">Our Story</a>
+  </aside>
+
+  <main>
+    <section class="hero" id="new">
+      <img src="assets/hero-bags.png" alt="Premium handbags arranged on boutique plinths">
+      <div class="hero-copy">
+        <p class="eyebrow">Spring edit</p>
+        <h1>Carry the day beautifully.</h1>
+        <p>Soft structure, refined hardware, and practical shapes designed for workdays, weekends, and every small escape between.</p>
+        <div class="hero-actions">
+          <a class="primary-link" href="#catalog">View new arrivals</a>
+          <a class="secondary-link" href="#collections">Explore collections</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="category-strip" id="collections" aria-label="Bag categories">
+      <a href="#catalog" data-filter="Signature Denim Bags"><span>Signature Denim Bags</span></a>
+      <a href="#catalog" data-filter="Clutch Bags"><span>Clutch Bags</span></a>
+      <a href="#catalog" data-filter="Crossbody Bags"><span>Crossbody Bags</span></a>
+      <a href="#catalog" data-filter="Top Handles Bag"><span>Top Handles Bag</span></a>
+    </section>
+
+    <section class="section-heading">
+      <p class="eyebrow">Current collection</p>
+      <h2>Made to move with you</h2>
+      <p>A clean catalog experience for browsing shapes, materials, colors, and new arrivals without prices or checkout.</p>
+    </section>
+
+    <section class="toolbar" id="catalog">
+      <div class="search-box">
+        <label for="searchInput">Search collection</label>
+        <input id="searchInput" type="search" placeholder="Try denim, clutch, crossbody...">
+      </div>
+      <div class="filter-buttons" aria-label="Filter products">
+        <button class="filter active" type="button" data-filter="All">All</button>
+        <button class="filter" type="button" data-filter="Signature Denim Bags">Denim</button>
+        <button class="filter" type="button" data-filter="Clutch Bags">Clutch</button>
+        <button class="filter" type="button" data-filter="Crossbody Bags">Crossbody</button>
+        <button class="filter" type="button" data-filter="Top Handles Bag">Top Handle</button>
+      </div>
+    </section>
+
+    <section class="product-grid" aria-live="polite"></section>
+
+    <section class="editorial" id="story">
+      <div class="editorial-image">
+        <img src="assets/catalog-bags.png" alt="A catalog collage of original handbag styles">
+      </div>
+      <div class="editorial-copy">
+        <p class="eyebrow">The atelier note</p>
+        <h2>Polished bags without the precious attitude.</h2>
+        <p>MONVE NEPAL is built around reliable shapes, satisfying closures, comfortable straps, and materials that look better as they collect stories.</p>
+        <a class="primary-link dark" href="#catalog">Find your shape</a>
+      </div>
+    </section>
+
+    <section class="trust-row" aria-label="Catalog benefits">
+      <div>
+        <strong>Fresh drops</strong>
+        <span>New pieces are easy to publish.</span>
+      </div>
+      <div>
+        <strong>No-code updates</strong>
+        <span>Client controls the catalog.</span>
+      </div>
+      <div>
+        <strong>Clear categories</strong>
+        <span>Browse by bag style.</span>
+      </div>
+      <div>
+        <strong>Direct inquiry</strong>
+        <span>Visitors can ask before buying.</span>
+      </div>
+    </section>
+
+    <section class="promo" id="inquiry">
+      <div class="promo-mark">
+        <img src="assets/monve-logo.png" alt="">
+      </div>
+      <span class="promo-kicker">Visit the boutique or ask for availability</span>
+      <p>Interested in a piece?</p>
+      <div class="contact-list" aria-label="MONVE NEPAL contact details">
+        <a href="https://www.google.com/maps/search/?api=1&query=Durbarmall%20Ground%20Floor%20Shop%20No%20412%20Durbar%20Marg" target="_blank" rel="noreferrer">
+          <span class="contact-icon location-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-5.7 8-13a8 8 0 1 0-16 0c0 7.3 8 13 8 13Z"/><circle cx="12" cy="9" r="2.6"/><path d="M9 18.4h6"/></svg>
+          </span>
+          <span><strong>Location</strong>Durbarmall, Ground Floor, Shop No: 412, Durbar Marg</span>
+        </a>
+        <a href="mailto:monvenepal@gmail.com">
+          <span class="contact-icon email-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M3.5 6.5h17v11h-17z"/><path d="m4 7 8 6.2L20 7"/><path d="m8.2 11.8-4.2 4.8M15.8 11.8l4.2 4.8"/></svg>
+          </span>
+          <span><strong>Email</strong>monvenepal@gmail.com</span>
+        </a>
+        <a href="https://wa.me/9779840559803" target="_blank" rel="noreferrer">
+          <span class="contact-icon whatsapp-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M20 11.7a8 8 0 0 1-11.8 7L4 20l1.3-4A8 8 0 1 1 20 11.7Z"/><path d="M9.4 8.3c.2-.4.4-.4.7-.4h.5c.2 0 .4.1.5.4l.7 1.6c.1.2.1.4-.1.6l-.4.5c-.1.1-.2.3-.1.5.4.8 1.2 1.6 2.2 2 .2.1.4.1.5-.1l.6-.7c.2-.2.4-.2.6-.1l1.5.7c.3.1.4.3.4.6 0 .6-.4 1.5-1.1 1.7-1 .3-3.3-.4-5.1-2.2-1.8-1.8-2.5-4.1-2.2-5 .1-.3.2-.5.3-.7Z"/></svg>
+          </span>
+          <span><strong>WhatsApp</strong>+977 9840559803</span>
+        </a>
+        <a href="https://www.instagram.com/monve.np/" target="_blank" rel="noreferrer">
+          <span class="contact-icon instagram-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><rect x="4.8" y="4.8" width="14.4" height="14.4" rx="4.4"/><circle cx="12" cy="12" r="3.3"/><circle cx="16.7" cy="7.4" r=".8"/><path d="M8.3 4.8h7.4"/></svg>
+          </span>
+          <span><strong>Instagram</strong>@monve.np</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-main">
+      <strong class="footer-brand">
+        <img src="assets/monve-logo.png" alt="Monve Nepal logo">
+        MONVE NEPAL
+      </strong>
+      <p>Elegant bag collections curated from Durbar Marg, Kathmandu.</p>
+    </div>
+    <div class="footer-links">
+      <a href="https://wa.me/9779840559803" target="_blank" rel="noreferrer">WhatsApp</a>
+      <a href="https://www.instagram.com/monve.np/" target="_blank" rel="noreferrer">Instagram</a>
+      <a href="mailto:monvenepal@gmail.com">Email</a>
+      <span>Durbarmall, Shop No: 412</span>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
