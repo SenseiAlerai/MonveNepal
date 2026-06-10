@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="announcement">New arrivals added monthly - browse the latest collection</div>
+  <div class="announcement" data-setting="announcement">New arrivals added monthly - browse the latest collection</div>
 
   <header class="site-header">
     <button class="icon-button menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false">
@@ -41,11 +41,11 @@
 
   <main>
     <section class="hero" id="new">
-      <img src="assets/hero-bags.png" alt="Premium handbags arranged on boutique plinths">
+      <img data-setting-image="heroImage" src="assets/hero-bags.png" alt="Premium handbags arranged on boutique plinths">
       <div class="hero-copy">
-        <p class="eyebrow">Spring edit</p>
-        <h1>Carry the day beautifully.</h1>
-        <p>Soft structure, refined hardware, and practical shapes designed for workdays, weekends, and every small escape between.</p>
+        <p class="eyebrow" data-setting="heroEyebrow">Spring edit</p>
+        <h1 data-setting="heroTitle">Carry the day beautifully.</h1>
+        <p data-setting="heroText">Soft structure, refined hardware, and practical shapes designed for workdays, weekends, and every small escape between.</p>
         <div class="hero-actions">
           <a class="primary-link" href="#catalog">View new arrivals</a>
           <a class="secondary-link" href="#collections">Explore collections</a>
@@ -53,12 +53,7 @@
       </div>
     </section>
 
-    <section class="category-strip" id="collections" aria-label="Bag categories">
-      <a href="#catalog" data-filter="Signature Denim Bags"><span>Signature Denim Bags</span></a>
-      <a href="#catalog" data-filter="Clutch Bags"><span>Clutch Bags</span></a>
-      <a href="#catalog" data-filter="Crossbody Bags"><span>Crossbody Bags</span></a>
-      <a href="#catalog" data-filter="Top Handles Bag"><span>Top Handles Bag</span></a>
-    </section>
+    <section class="category-strip" id="collections" aria-label="Bag categories"></section>
 
     <section class="section-heading">
       <p class="eyebrow">Current collection</p>
@@ -71,25 +66,19 @@
         <label for="searchInput">Search collection</label>
         <input id="searchInput" type="search" placeholder="Try denim, clutch, crossbody...">
       </div>
-      <div class="filter-buttons" aria-label="Filter products">
-        <button class="filter active" type="button" data-filter="All">All</button>
-        <button class="filter" type="button" data-filter="Signature Denim Bags">Denim</button>
-        <button class="filter" type="button" data-filter="Clutch Bags">Clutch</button>
-        <button class="filter" type="button" data-filter="Crossbody Bags">Crossbody</button>
-        <button class="filter" type="button" data-filter="Top Handles Bag">Top Handle</button>
-      </div>
+      <div class="filter-buttons" aria-label="Filter products"></div>
     </section>
 
     <section class="product-grid" aria-live="polite"></section>
 
     <section class="editorial" id="story">
       <div class="editorial-image">
-        <img src="assets/catalog-bags.png" alt="A catalog collage of original handbag styles">
+        <img data-setting-image="storyImage" src="assets/catalog-bags.png" alt="A catalog collage of original handbag styles">
       </div>
       <div class="editorial-copy">
-        <p class="eyebrow">The atelier note</p>
-        <h2>Polished bags without the precious attitude.</h2>
-        <p>MONVE NEPAL is built around reliable shapes, satisfying closures, comfortable straps, and materials that look better as they collect stories.</p>
+        <p class="eyebrow" data-setting="storyEyebrow">The atelier note</p>
+        <h2 data-setting="storyTitle">Polished bags without the precious attitude.</h2>
+        <p data-setting="storyText">MONVE NEPAL is built around reliable shapes, satisfying closures, comfortable straps, and materials that look better as they collect stories.</p>
         <a class="primary-link dark" href="#catalog">Find your shape</a>
       </div>
     </section>

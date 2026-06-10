@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MONVE NEPAL Admin</title>
+  <link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+  <main>
+    <section class="login-panel" id="loginPanel">
+      <div>
+        <p class="eyebrow">MONVE NEPAL</p>
+        <h1>Admin Login</h1>
+        <p>Manage homepage images, categories, and bag collection items.</p>
+      </div>
+      <form id="loginForm">
+        <label>Username<input name="username" autocomplete="username" required></label>
+        <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+        <button type="submit">Login</button>
+        <p class="notice" id="loginNotice"></p>
+      </form>
+    </section>
+
+    <section class="admin-app" id="adminApp" hidden>
+      <header class="admin-header">
+        <div>
+          <p class="eyebrow">MONVE NEPAL</p>
+          <h1>Catalog Admin</h1>
+        </div>
+        <div class="header-actions">
+          <a href="/" target="_blank">View Site</a>
+          <button id="logoutButton" type="button">Logout</button>
+        </div>
+      </header>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <h2>Homepage</h2>
+          <p>Update the main banner and story block.</p>
+        </div>
+        <form id="settingsForm" class="form-grid">
+          <label>Announcement<input name="announcement"></label>
+          <label>Hero Eyebrow<input name="heroEyebrow"></label>
+          <label>Hero Title<input name="heroTitle"></label>
+          <label class="wide">Hero Description<textarea name="heroText"></textarea></label>
+          <label>Hero Image<input name="heroImageFile" type="file" accept="image/*"></label>
+          <label>Story Image<input name="storyImageFile" type="file" accept="image/*"></label>
+          <label>Story Eyebrow<input name="storyEyebrow"></label>
+          <label>Story Title<input name="storyTitle"></label>
+          <label class="wide">Story Text<textarea name="storyText"></textarea></label>
+          <button type="submit">Save Homepage</button>
+          <p class="notice" id="settingsNotice"></p>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <h2>Categories</h2>
+          <p>These become the category strip and filters on the site.</p>
+        </div>
+        <form id="categoryForm" class="inline-form">
+          <input name="name" placeholder="Category name" required>
+          <input name="sortOrder" type="number" placeholder="Order" value="0">
+          <button type="submit">Add Category</button>
+        </form>
+        <div class="table" id="categoryList"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <h2>Bags</h2>
+          <p>Add, update, hide, or delete collection items.</p>
+        </div>
+        <form id="bagForm" class="form-grid">
+          <input name="id" type="hidden">
+          <label>Name<input name="name" required></label>
+          <label>Category<select name="categoryId"></select></label>
+          <label>Color / Finish<input name="color"></label>
+          <label>Tag<input name="tag" placeholder="New Arrival, Featured, Limited"></label>
+          <label>Sort Order<input name="sortOrder" type="number" value="0"></label>
+          <label>Visible<select name="visible"><option value="1">Visible</option><option value="0">Hidden</option></select></label>
+          <label class="wide">Description<textarea name="description"></textarea></label>
+          <label>Bag Image<input name="image" type="file" accept="image/*"></label>
+          <div class="form-actions">
+            <button type="submit">Save Bag</button>
+            <button id="clearBagForm" type="button">Clear</button>
+          </div>
+          <p class="notice" id="bagNotice"></p>
+        </form>
+        <div class="bag-list" id="bagList"></div>
+      </section>
+    </section>
+  </main>
+
+  <script src="/admin/admin.js"></script>
+</body>
+</html>

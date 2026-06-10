@@ -1,0 +1,19 @@
+{
+  "name": "monve-nepal-cms",
+  "version": "1.0.0",
+  "description": "MONVE NEPAL catalog website with a lightweight admin CMS.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "check": "node --check server.js && node --check script.js && node --check admin/admin.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "multer": "^2.0.2"
+  }
+}

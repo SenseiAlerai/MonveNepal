@@ -1,31 +1,25 @@
-const products = [
-  { name: "MONVE Denim Signature", category: "Signature Denim Bags", color: "Deep indigo", tag: "New Arrival", position: "0% 0%" },
-  { name: "Satin Evening Clutch", category: "Clutch Bags", color: "Pearl gray", tag: "Featured", position: "50% 0%" },
-  { name: "City Clasp Crossbody", category: "Crossbody Bags", color: "Black gloss", tag: "Compact", position: "100% 0%" },
-  { name: "Petite Top Handle", category: "Top Handles Bag", color: "Cranberry", tag: "New Arrival", position: "0% 100%" },
-  { name: "Soft Frame Clutch", category: "Clutch Bags", color: "Warm tan", tag: "Classic", position: "50% 100%" },
-  { name: "Arc Top Handle", category: "Top Handles Bag", color: "Ivory grain", tag: "Limited", position: "100% 100%" }
-];
-
 const grid = document.querySelector(".product-grid");
-const filters = document.querySelectorAll(".filter");
+const filterButtons = document.querySelector(".filter-buttons");
+const categoryStrip = document.querySelector(".category-strip");
 const searchInput = document.querySelector("#searchInput");
 const menuToggle = document.querySelector(".menu-toggle");
 const mobilePanel = document.querySelector(".mobile-panel");
 let activeFilter = "All";
+let products = [];
+let categories = [];
 
 function renderProducts() {
   const query = searchInput.value.trim().toLowerCase();
   const visibleProducts = products.filter((product) => {
-    const matchesFilter = activeFilter === "All" || product.category === activeFilter;
-    const matchesSearch = [product.name, product.category, product.color].join(" ").toLowerCase().includes(query);
+    const matchesFilter = activeFilter === "All" || product.categorySlug === activeFilter;
+    const matchesSearch = [product.name, product.category, product.color, product.tag].join(" ").toLowerCase().includes(query);
     return matchesFilter && matchesSearch;
   });
 
   grid.innerHTML = visibleProducts.map((product) => `
     <article class="product-card">
       <div class="product-media">
-        <img src="assets/catalog-bags.png" alt="${product.name}" style="object-position: ${product.position}">
+        <img src="${product.imageUrl || "assets/catalog-bags.png"}" alt="${product.name}">
       </div>
       <div class="product-info">
         <h3>${product.name}</h3>
@@ -39,20 +33,57 @@ function renderProducts() {
   `).join("") || `<p class="empty-state">No bags match that search.</p>`;
 }
 
-filters.forEach((button) => {
-  button.addEventListener("click", () => {
-    activeFilter = button.dataset.filter;
-    filters.forEach((item) => item.classList.toggle("active", item === button));
-    renderProducts();
-  });
-});
+function renderCategories() {
+  categoryStrip.innerHTML = categories.map((category) => `
+    <a href="#catalog" data-filter="${category.slug}"><span>${category.name}</span></a>
+  `).join("");
 
-document.querySelectorAll("[data-filter]").forEach((link) => {
-  link.addEventListener("click", () => {
-    const target = [...filters].find((button) => button.dataset.filter === link.dataset.filter);
-    target?.click();
+  filterButtons.innerHTML = [
+    `<button class="filter active" type="button" data-filter="All">All</button>`,
+    ...categories.map((category) => `
+      <button class="filter" type="button" data-filter="${category.slug}">${category.name.replace(/ bags?/i, "")}</button>
+    `)
+  ].join("");
+}
+
+function bindFilters() {
+  document.querySelectorAll("[data-filter]").forEach((item) => {
+    item.addEventListener("click", () => {
+      activeFilter = item.dataset.filter;
+      document.querySelectorAll(".filter").forEach((button) => {
+        button.classList.toggle("active", button.dataset.filter === activeFilter);
+      });
+      renderProducts();
+    });
   });
-});
+}
+
+function applySettings(settings) {
+  document.querySelectorAll("[data-setting]").forEach((node) => {
+    const key = node.dataset.setting;
+    if (settings[key]) node.textContent = settings[key];
+  });
+  document.querySelectorAll("[data-setting-image]").forEach((node) => {
+    const key = node.dataset.settingImage;
+    if (settings[key]) node.src = settings[key];
+  });
+}
+
+async function loadCatalog() {
+  try {
+    const response = await fetch("/api/catalog");
+    if (!response.ok) throw new Error("Catalog request failed");
+    const data = await response.json();
+    products = data.bags || [];
+    categories = data.categories || [];
+    applySettings(data.settings || {});
+    renderCategories();
+    bindFilters();
+    renderProducts();
+  } catch (error) {
+    grid.innerHTML = `<p class="empty-state">Catalog is loading. Please refresh in a moment.</p>`;
+  }
+}
 
 searchInput.addEventListener("input", renderProducts);
 
@@ -74,4 +105,4 @@ document.querySelector(".search-toggle").addEventListener("click", () => {
   searchInput.focus();
 });
 
-renderProducts();
+loadCatalog();
