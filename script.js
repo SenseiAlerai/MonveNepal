@@ -114,18 +114,45 @@ async function loadCatalog() {
 
 searchInput.addEventListener("input", renderProducts);
 
-menuToggle.addEventListener("click", () => {
+function closeMobileMenu() {
+  document.body.classList.remove("nav-open");
+  menuToggle.setAttribute("aria-expanded", "false");
+  mobilePanel.setAttribute("aria-hidden", "true");
+}
+
+menuToggle.addEventListener("click", (event) => {
+  event.stopPropagation();
   const isOpen = document.body.classList.toggle("nav-open");
   menuToggle.setAttribute("aria-expanded", String(isOpen));
   mobilePanel.setAttribute("aria-hidden", String(!isOpen));
 });
 
 document.querySelectorAll(".mobile-panel a").forEach((link) => {
-  link.addEventListener("click", () => {
-    document.body.classList.remove("nav-open");
-    menuToggle.setAttribute("aria-expanded", "false");
-    mobilePanel.setAttribute("aria-hidden", "true");
-  });
+  link.addEventListener("click", closeMobileMenu);
+});
+
+mobilePanel.addEventListener("click", (event) => {
+  event.stopPropagation();
+});
+
+document.addEventListener("click", (event) => {
+  if (!document.body.classList.contains("nav-open")) return;
+  if (mobilePanel.contains(event.target) || menuToggle.contains(event.target)) return;
+  closeMobileMenu();
+});
+
+document.addEventListener("touchstart", (event) => {
+  if (!document.body.classList.contains("nav-open")) return;
+  if (mobilePanel.contains(event.target) || menuToggle.contains(event.target)) return;
+  closeMobileMenu();
+}, { passive: true });
+
+window.addEventListener("scroll", () => {
+  if (document.body.classList.contains("nav-open")) closeMobileMenu();
+}, { passive: true });
+
+window.addEventListener("resize", () => {
+  if (document.body.classList.contains("nav-open")) closeMobileMenu();
 });
 
 document.querySelector(".search-toggle").addEventListener("click", () => {
