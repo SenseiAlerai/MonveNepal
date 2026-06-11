@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="cms-loading">
   <div class="announcement" data-setting="announcement">New arrivals added monthly - browse the latest collection</div>
 
   <header class="site-header">
@@ -40,7 +40,7 @@
 
   <main>
     <section class="hero" id="new">
-      <img data-setting-image="heroImage" src="assets/hero-bags.png" alt="Premium handbags arranged on boutique plinths">
+      <img data-setting-image="heroImage" data-fallback-src="assets/hero-bags.png" alt="Premium handbags arranged on boutique plinths">
       <div class="hero-copy">
         <p class="eyebrow" data-setting="heroEyebrow">Spring edit</p>
         <h1 data-setting="heroTitle">Carry the day beautifully.</h1>
@@ -72,7 +72,7 @@
 
     <section class="editorial" id="story">
       <div class="editorial-image">
-        <img data-setting-image="storyImage" src="assets/catalog-bags.png" alt="A catalog collage of original handbag styles">
+        <img data-setting-image="storyImage" data-fallback-src="assets/catalog-bags.png" alt="A catalog collage of original handbag styles">
       </div>
       <div class="editorial-copy">
         <p class="eyebrow" data-setting="storyEyebrow">The atelier note</p>
@@ -84,7 +84,7 @@
 
     <section class="contact-showcase" id="inquiry">
       <div class="contact-hero">
-        <img data-setting-image="contactHeroImage" src="assets/hero-bags.png" alt="MONVE NEPAL handbag collection">
+        <img data-setting-image="contactHeroImage" data-fallback-src="assets/hero-bags.png" alt="MONVE NEPAL handbag collection">
         <div class="contact-hero-copy">
           <span class="contact-kicker">Contact us</span>
           <h2>We're here<br>to help.</h2>

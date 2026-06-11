@@ -93,7 +93,7 @@ function applySettings(settings) {
   });
   document.querySelectorAll("[data-setting-image]").forEach((node) => {
     const key = node.dataset.settingImage;
-    if (settings[key]) node.src = settings[key];
+    node.src = settings[key] || node.dataset.fallbackSrc || "";
   });
 }
 
@@ -108,7 +108,12 @@ async function loadCatalog() {
     renderCategories();
     bindFilters();
     renderProducts();
+    document.body.classList.remove("cms-loading");
   } catch (error) {
+    document.querySelectorAll("[data-setting-image]").forEach((node) => {
+      node.src = node.dataset.fallbackSrc || "";
+    });
+    document.body.classList.remove("cms-loading");
     grid.innerHTML = `<p class="empty-state">Catalog is loading. Please refresh in a moment.</p>`;
   }
 }
