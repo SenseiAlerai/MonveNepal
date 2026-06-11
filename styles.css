@@ -214,26 +214,37 @@ h2 { font-size: clamp(34px, 5vw, 58px); }
 .secondary-link { border: 1px solid rgba(255,255,255,.7); color: white; }
 
 .category-strip {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
+  gap: 10px;
+  padding: 16px clamp(18px, 5vw, 72px);
+  overflow-x: auto;
   border-block: 1px solid var(--border);
-  background: #fff;
+  background: #fffaf1;
+  scrollbar-width: thin;
 }
 
 .category-strip a {
-  min-height: 104px;
-  display: grid;
+  min-height: 48px;
+  flex: 0 0 auto;
+  display: inline-grid;
   place-items: center;
-  border-right: 1px solid var(--border);
-  font-family: "Playfair Display", serif;
-  font-size: clamp(20px, 2.45vw, 34px);
-  font-weight: 700;
-  line-height: 1.08;
-  padding: 18px;
+  border: 1px solid rgba(176, 132, 65, .28);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .74);
+  color: #4a3823;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  line-height: 1.2;
+  padding: 0 20px;
   text-align: center;
+  text-transform: uppercase;
 }
 
-.category-strip a:last-child { border-right: 0; }
+.category-strip a:hover {
+  border-color: rgba(176, 132, 65, .7);
+  background: #fff;
+}
 
 .section-heading {
   max-width: 850px;
@@ -301,11 +312,49 @@ h2 { font-size: clamp(34px, 5vw, 58px); }
   margin: 0 auto 82px;
   padding: 0 22px;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 46px;
+}
+
+.collection-section {
+  display: grid;
   gap: 18px;
 }
 
+.collection-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 1px solid rgba(176, 132, 65, .24);
+  padding-bottom: 12px;
+}
+
+.collection-heading h3 {
+  margin: 0;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(30px, 4vw, 48px);
+  line-height: 1;
+}
+
+.collection-heading .eyebrow {
+  margin: 0;
+  color: #a17635;
+}
+
+.collection-rail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(240px, 300px);
+  gap: 18px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding: 4px 4px 18px;
+  scroll-snap-type: inline mandatory;
+  scrollbar-width: thin;
+}
+
 .product-card {
+  scroll-snap-align: start;
   background: linear-gradient(180deg, #fff, #f8f3ea);
   border: 1px solid rgba(217, 173, 95, .22);
   border-radius: 8px;
@@ -407,24 +456,6 @@ h2 { font-size: clamp(34px, 5vw, 58px); }
 }
 
 .editorial-copy p { color: var(--muted); }
-
-.trust-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  background: #fff;
-  border-block: 1px solid var(--border);
-}
-
-.trust-row div {
-  display: grid;
-  gap: 7px;
-  padding: 28px;
-  text-align: center;
-  border-right: 1px solid var(--border);
-}
-
-.trust-row div:last-child { border-right: 0; }
-.trust-row span { color: var(--muted); font-size: 14px; }
 
 .contact-showcase {
   background: #f4efe7;
@@ -736,10 +767,7 @@ body.nav-open .mobile-panel {
     padding: 34px 22px;
   }
 
-  .category-strip,
-  .product-grid,
   .editorial,
-  .trust-row,
   .contact-info-grid,
   .contact-footer-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -768,10 +796,7 @@ body.nav-open .mobile-panel {
   }
   .inquiry-link { padding-inline: 10px; }
 
-  .category-strip,
-  .product-grid,
   .editorial,
-  .trust-row,
   .contact-info-grid,
   .contact-footer-grid {
     grid-template-columns: 1fr;
@@ -791,20 +816,32 @@ body.nav-open .mobile-panel {
     border-bottom: 1px solid rgba(176, 132, 65, .22);
   }
 
+  .category-strip {
+    padding-inline: 14px;
+  }
+
   .category-strip a {
-    min-height: 72px;
-    border-right: 0;
-    border-bottom: 1px solid var(--border);
+    min-height: 42px;
+    padding-inline: 16px;
+    font-size: 12px;
+  }
+
+  .product-grid {
+    padding-inline: 14px;
+  }
+
+  .collection-heading {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .collection-rail {
+    grid-auto-columns: minmax(220px, 78vw);
   }
 
   .editorial-image,
   .editorial-image img {
     min-height: 360px;
-  }
-
-  .trust-row div {
-    border-right: 0;
-    border-bottom: 1px solid var(--border);
   }
 
   .footer { flex-direction: column; }

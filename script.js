@@ -16,7 +16,34 @@ function renderProducts() {
     return matchesFilter && matchesSearch;
   });
 
-  grid.innerHTML = visibleProducts.map((product) => `
+  if (!visibleProducts.length) {
+    grid.innerHTML = `<p class="empty-state">No bags match that search.</p>`;
+    return;
+  }
+
+  const visibleCategories = categories.filter((category) => {
+    if (activeFilter !== "All" && category.slug !== activeFilter) return false;
+    return visibleProducts.some((product) => product.categorySlug === category.slug);
+  });
+
+  grid.innerHTML = visibleCategories.map((category) => {
+    const categoryProducts = visibleProducts.filter((product) => product.categorySlug === category.slug);
+    return `
+      <section class="collection-section" id="collection-${category.slug}">
+        <div class="collection-heading">
+          <p class="eyebrow">${categoryProducts.length} piece${categoryProducts.length === 1 ? "" : "s"}</p>
+          <h3>${category.name}</h3>
+        </div>
+        <div class="collection-rail">
+          ${categoryProducts.map(renderProductCard).join("")}
+        </div>
+      </section>
+    `;
+  }).join("");
+}
+
+function renderProductCard(product) {
+  return `
     <article class="product-card">
       <div class="product-media">
         <img src="${product.imageUrl || "assets/catalog-bags.png"}" alt="${product.name}">
@@ -30,18 +57,18 @@ function renderProducts() {
         <a class="add-button" href="#inquiry">Ask about this bag</a>
       </div>
     </article>
-  `).join("") || `<p class="empty-state">No bags match that search.</p>`;
+  `;
 }
 
 function renderCategories() {
   categoryStrip.innerHTML = categories.map((category) => `
-    <a href="#catalog" data-filter="${category.slug}"><span>${category.name}</span></a>
+    <a href="#collection-${category.slug}" data-filter="${category.slug}"><span>${category.name}</span></a>
   `).join("");
 
   filterButtons.innerHTML = [
     `<button class="filter active" type="button" data-filter="All">All</button>`,
     ...categories.map((category) => `
-      <button class="filter" type="button" data-filter="${category.slug}">${category.name.replace(/ bags?/i, "")}</button>
+      <button class="filter" type="button" data-filter="${category.slug}">${category.name}</button>
     `)
   ].join("");
 }

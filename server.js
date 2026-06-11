@@ -42,12 +42,12 @@ function slugify(value) {
 }
 
 function defaultData() {
-  const categories = ["Signature Denim Bags", "Clutch Bags", "Crossbody Bags", "Top Handles Bag"]
+  const categories = ["Signature Denim Bags", "Clutch Bags", "Crossbody Bags", "Top Handles Bag", "Tote Bags"]
     .map((name, index) => ({ id: index + 1, name, slug: slugify(name), sort_order: index + 1, visible: 1 }));
 
   return {
-    nextCategoryId: 5,
-    nextBagId: 7,
+    nextCategoryId: 6,
+    nextBagId: 8,
     settings: {
       announcement: "New arrivals added monthly - browse the latest collection",
       heroEyebrow: "Spring edit",
@@ -68,7 +68,8 @@ function defaultData() {
       ["City Clasp Crossbody", 3, "Black gloss", "Compact", "A hands-free shape with a clean clasp detail."],
       ["Petite Top Handle", 4, "Cranberry", "New Arrival", "A structured top-handle profile with a compact finish."],
       ["Soft Frame Clutch", 2, "Warm tan", "Classic", "Soft framed styling for everyday elegance."],
-      ["Arc Top Handle", 4, "Ivory grain", "Limited", "An ivory top-handle bag with a graceful arc profile."]
+      ["Arc Top Handle", 4, "Ivory grain", "Limited", "An ivory top-handle bag with a graceful arc profile."],
+      ["MONVE Everyday Tote", 5, "Soft cream", "New Arrival", "A spacious tote for polished everyday carrying."]
     ].map((bag, index) => ({
       id: index + 1,
       name: bag[0],
@@ -100,6 +101,37 @@ function readDb() {
       changed = true;
     }
   });
+  if (!data.categories.some((category) => category.slug === "tote-bags")) {
+    const nextCategoryId = data.nextCategoryId || Math.max(0, ...data.categories.map((category) => category.id || 0)) + 1;
+    data.categories.push({
+      id: nextCategoryId,
+      name: "Tote Bags",
+      slug: "tote-bags",
+      sort_order: 5,
+      visible: 1
+    });
+    data.nextCategoryId = nextCategoryId + 1;
+    changed = true;
+  }
+  const toteCategory = data.categories.find((category) => category.slug === "tote-bags");
+  if (toteCategory && !data.bags.some((bag) => bag.category_id === toteCategory.id)) {
+    const nextBagId = data.nextBagId || Math.max(0, ...data.bags.map((bag) => bag.id || 0)) + 1;
+    data.bags.push({
+      id: nextBagId,
+      name: "MONVE Everyday Tote",
+      category_id: toteCategory.id,
+      color: "Soft cream",
+      tag: "New Arrival",
+      description: "A spacious tote for polished everyday carrying.",
+      imageUrl: "/assets/catalog-bags.png",
+      sort_order: 7,
+      visible: 1,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    });
+    data.nextBagId = nextBagId + 1;
+    changed = true;
+  }
   if (changed) writeDb(data);
   return data;
 }
