@@ -11,6 +11,7 @@
   --gold-soft: #f3d58f;
   --night: #11100e;
   --header-offset: 103px;
+  --mobile-panel-top: 103px;
 }
 
 * { box-sizing: border-box; }
@@ -125,7 +126,7 @@ img { display: block; max-width: 100%; }
 .mobile-panel {
   display: none;
   position: fixed;
-  inset: var(--header-offset) 0 auto 0;
+  inset: var(--mobile-panel-top) 0 auto 0;
   z-index: 18;
   background: var(--paper);
   border-bottom: 1px solid var(--border);
@@ -684,6 +685,10 @@ body.nav-open .mobile-panel {
   }
 
   .brand { font-size: 22px; }
+  .logo-brand {
+    margin-left: -8px;
+  }
+
   .logo-brand img {
     width: 174px;
     height: 60px;

@@ -128,7 +128,10 @@ function closeMobileMenu() {
 
 function syncMobilePanelOffset() {
   if (!siteHeader) return;
+  const headerRect = siteHeader.getBoundingClientRect();
+  const panelTop = Math.max(0, headerRect.top) + siteHeader.offsetHeight;
   document.documentElement.style.setProperty("--header-offset", `${siteHeader.offsetHeight}px`);
+  document.documentElement.style.setProperty("--mobile-panel-top", `${panelTop}px`);
 }
 
 menuToggle.addEventListener("click", (event) => {
