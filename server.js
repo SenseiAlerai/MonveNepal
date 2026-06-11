@@ -57,7 +57,9 @@ function defaultData() {
       storyEyebrow: "The atelier note",
       storyTitle: "Polished bags without the precious attitude.",
       storyText: "MONVE NEPAL is built around reliable shapes, satisfying closures, comfortable straps, and materials that look better as they collect stories.",
-      storyImage: "/assets/catalog-bags.png"
+      storyImage: "/assets/catalog-bags.png",
+      contactHeroImage: "/assets/hero-bags.png",
+      contactFeatureImage: "/assets/catalog-bags.png"
     },
     categories,
     bags: [
@@ -89,7 +91,17 @@ function readDb() {
     writeDb(initial);
     return initial;
   }
-  return JSON.parse(fs.readFileSync(dbPath, "utf8"));
+  const data = JSON.parse(fs.readFileSync(dbPath, "utf8"));
+  let changed = false;
+  const defaults = defaultData().settings;
+  ["contactHeroImage", "contactFeatureImage"].forEach((key) => {
+    if (!data.settings[key]) {
+      data.settings[key] = defaults[key];
+      changed = true;
+    }
+  });
+  if (changed) writeDb(data);
+  return data;
 }
 
 function writeDb(data) {
@@ -207,7 +219,9 @@ app.get("/api/admin/data", requireAdmin, (req, res) => res.json(publicPayload(tr
 
 app.put("/api/admin/settings", requireAdmin, upload.fields([
   { name: "heroImageFile", maxCount: 1 },
-  { name: "storyImageFile", maxCount: 1 }
+  { name: "storyImageFile", maxCount: 1 },
+  { name: "contactHeroImageFile", maxCount: 1 },
+  { name: "contactFeatureImageFile", maxCount: 1 }
 ]), async (req, res, next) => {
   try {
   const data = readDb();
@@ -216,8 +230,12 @@ app.put("/api/admin/settings", requireAdmin, upload.fields([
   });
   const heroImage = await uploadBufferToCloudinary(req.files?.heroImageFile?.[0]);
   const storyImage = await uploadBufferToCloudinary(req.files?.storyImageFile?.[0]);
+  const contactHeroImage = await uploadBufferToCloudinary(req.files?.contactHeroImageFile?.[0]);
+  const contactFeatureImage = await uploadBufferToCloudinary(req.files?.contactFeatureImageFile?.[0]);
   if (heroImage) data.settings.heroImage = heroImage;
   if (storyImage) data.settings.storyImage = storyImage;
+  if (contactHeroImage) data.settings.contactHeroImage = contactHeroImage;
+  if (contactFeatureImage) data.settings.contactFeatureImage = contactFeatureImage;
   writeDb(data);
   res.json(publicPayload(true));
   } catch (error) {

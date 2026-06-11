@@ -126,6 +126,8 @@ settingsForm.addEventListener("submit", async (event) => {
     });
     settingsForm.elements.heroImageFile.value = "";
     settingsForm.elements.storyImageFile.value = "";
+    settingsForm.elements.contactHeroImageFile.value = "";
+    settingsForm.elements.contactFeatureImageFile.value = "";
     settingsNotice.textContent = "Homepage saved.";
   } catch (error) {
     settingsNotice.textContent = error.message;
