@@ -5,6 +5,15 @@ const searchInput = document.querySelector("#searchInput");
 const menuToggle = document.querySelector(".menu-toggle");
 const mobilePanel = document.querySelector(".mobile-panel");
 const siteHeader = document.querySelector(".site-header");
+const productModal = document.querySelector("#productModal");
+const modalProductImage = document.querySelector("#modalProductImage");
+const modalProductCategory = document.querySelector("#modalProductCategory");
+const modalProductName = document.querySelector("#modalProductName");
+const modalProductDescription = document.querySelector("#modalProductDescription");
+const modalColorSwatch = document.querySelector("#modalColorSwatch");
+const modalColorName = document.querySelector("#modalColorName");
+const modalVariantRail = document.querySelector("#modalVariantRail");
+const modalInquiryLink = document.querySelector("#modalInquiryLink");
 let activeFilter = "All";
 let products = [];
 let categories = [];
@@ -13,7 +22,8 @@ function renderProducts() {
   const query = searchInput.value.trim().toLowerCase();
   const visibleProducts = products.filter((product) => {
     const matchesFilter = activeFilter === "All" || product.categorySlug === activeFilter;
-    const matchesSearch = [product.name, product.category, product.color, product.tag].join(" ").toLowerCase().includes(query);
+    const variantColors = (product.variants || []).map((variant) => variant.color).join(" ");
+    const matchesSearch = [product.name, product.category, product.color, variantColors, product.tag].join(" ").toLowerCase().includes(query);
     return matchesFilter && matchesSearch;
   });
 
@@ -44,21 +54,75 @@ function renderProducts() {
 }
 
 function renderProductCard(product) {
+  const variants = product.variants?.length ? product.variants : [{
+    color: product.color,
+    colorCode: "#d9ad5f",
+    imageUrl: product.imageUrl
+  }];
   return `
-    <article class="product-card">
+    <article class="product-card" data-open-product="${product.id}" tabindex="0">
       <div class="product-media">
         <img src="${product.imageUrl || "assets/catalog-bags.png"}" alt="${product.name}">
       </div>
       <div class="product-info">
         <h3>${product.name}</h3>
         <div class="meta">
-          <span>${product.color}</span>
+          <span>${variants.length} color${variants.length === 1 ? "" : "s"}</span>
           <strong>${product.tag}</strong>
         </div>
-        <a class="add-button" href="#inquiry">Ask about this bag</a>
+        <button class="add-button" type="button" data-open-product="${product.id}">View colors</button>
       </div>
     </article>
   `;
+}
+
+function productVariants(product) {
+  return product.variants?.length ? product.variants : [{
+    id: "default",
+    color: product.color || "Default",
+    colorCode: "#d9ad5f",
+    imageUrl: product.imageUrl || "assets/catalog-bags.png"
+  }];
+}
+
+function selectModalVariant(product, variantId) {
+  const variants = productVariants(product);
+  const variant = variants.find((item) => String(item.id) === String(variantId)) || variants[0];
+  modalProductImage.src = variant.imageUrl || product.imageUrl || "assets/catalog-bags.png";
+  modalProductImage.alt = `${product.name} in ${variant.color}`;
+  modalColorSwatch.style.background = variant.colorCode || "#d9ad5f";
+  modalColorName.textContent = variant.color || product.color || "Default";
+  modalVariantRail.querySelectorAll("[data-modal-variant]").forEach((button) => {
+    button.classList.toggle("active", String(button.dataset.modalVariant) === String(variant.id));
+  });
+}
+
+function openProductModal(productId) {
+  const product = products.find((item) => String(item.id) === String(productId));
+  if (!product) return;
+  const variants = productVariants(product);
+  modalProductCategory.textContent = product.category || "MONVE NEPAL";
+  modalProductName.textContent = product.name || "";
+  modalProductDescription.textContent = product.description || "";
+  modalVariantRail.innerHTML = variants.map((variant) => `
+    <button class="variant-pill" type="button" data-modal-variant="${variant.id}">
+      <img src="${variant.imageUrl || product.imageUrl || "assets/catalog-bags.png"}" alt="${variant.color || "Bag color"}">
+      <span class="variant-color-dot" style="background:${variant.colorCode || "#d9ad5f"}"></span>
+      <strong>${variant.color || "Color"}</strong>
+    </button>
+  `).join("");
+  modalVariantRail.querySelectorAll("[data-modal-variant]").forEach((button) => {
+    button.addEventListener("click", () => selectModalVariant(product, button.dataset.modalVariant));
+  });
+  modalInquiryLink.href = `#inquiry`;
+  productModal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("modal-open");
+  selectModalVariant(product, variants[0]?.id);
+}
+
+function closeProductModal() {
+  productModal.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("modal-open");
 }
 
 function renderCategories() {
@@ -119,6 +183,33 @@ async function loadCatalog() {
 }
 
 searchInput.addEventListener("input", renderProducts);
+
+grid.addEventListener("click", (event) => {
+  const trigger = event.target.closest("[data-open-product]");
+  if (!trigger) return;
+  event.preventDefault();
+  openProductModal(trigger.dataset.openProduct);
+});
+
+grid.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  const trigger = event.target.closest("[data-open-product]");
+  if (!trigger) return;
+  event.preventDefault();
+  openProductModal(trigger.dataset.openProduct);
+});
+
+productModal.addEventListener("click", (event) => {
+  if (event.target.closest("[data-close-modal]")) closeProductModal();
+});
+
+modalInquiryLink.addEventListener("click", closeProductModal);
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && productModal.getAttribute("aria-hidden") === "false") {
+    closeProductModal();
+  }
+});
 
 function closeMobileMenu() {
   document.body.classList.remove("nav-open");

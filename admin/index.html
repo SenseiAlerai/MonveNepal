@@ -78,12 +78,20 @@
           <input name="id" type="hidden">
           <label>Name<input name="name" required></label>
           <label>Category<select name="categoryId"></select></label>
-          <label>Color / Finish<input name="color"></label>
           <label>Tag<input name="tag" placeholder="New Arrival, Featured, Limited"></label>
           <label>Sort Order<input name="sortOrder" type="number" value="0"></label>
           <label>Visible<select name="visible"><option value="1">Visible</option><option value="0">Hidden</option></select></label>
           <label class="wide">Description<textarea name="description"></textarea></label>
-          <label>Bag Image<input name="image" type="file" accept="image/*"></label>
+          <div class="variant-editor wide">
+            <div class="variant-heading">
+              <div>
+                <h3>Color Variants</h3>
+                <p>Add one image per color. The first variant becomes the main catalog image.</p>
+              </div>
+              <button id="addVariant" type="button">Add Color</button>
+            </div>
+            <div class="variant-list" id="variantList"></div>
+          </div>
           <div class="form-actions">
             <button type="submit">Save Bag</button>
             <button id="clearBagForm" type="button">Clear</button>

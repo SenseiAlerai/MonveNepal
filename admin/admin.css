@@ -141,6 +141,68 @@ textarea {
   gap: 10px;
 }
 
+.variant-editor {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fbfaf7;
+  padding: 16px;
+}
+
+.variant-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.variant-heading h3,
+.variant-heading p {
+  margin: 0;
+}
+
+.variant-heading p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.variant-list {
+  display: grid;
+  gap: 12px;
+}
+
+.variant-row {
+  display: grid;
+  grid-template-columns: 110px 1fr 120px 1fr auto;
+  align-items: end;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.variant-preview {
+  width: 100%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #eee6dc;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.variant-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .form-actions button:last-child,
 #logoutButton,
 .delete-button {
@@ -210,6 +272,20 @@ textarea {
   line-height: 1.45;
 }
 
+.swatch-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.swatch {
+  width: 18px;
+  height: 18px;
+  border: 1px solid rgba(23, 21, 18, .18);
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .7);
+}
+
 .bag-actions {
   display: flex;
   gap: 8px;
@@ -225,7 +301,13 @@ textarea {
   .form-grid,
   .inline-form,
   .category-row,
+  .variant-row,
   .bag-list {
     grid-template-columns: 1fr;
+  }
+
+  .variant-heading {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }

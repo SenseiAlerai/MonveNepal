@@ -11,6 +11,8 @@ const bagForm = document.querySelector("#bagForm");
 const bagNotice = document.querySelector("#bagNotice");
 const bagList = document.querySelector("#bagList");
 const clearBagForm = document.querySelector("#clearBagForm");
+const addVariant = document.querySelector("#addVariant");
+const variantList = document.querySelector("#variantList");
 
 let categories = [];
 let bags = [];
@@ -77,7 +79,12 @@ function renderBags() {
       <img src="${bag.imageUrl}" alt="${bag.name}">
       <div class="bag-card-body">
         <h3>${bag.name}</h3>
-        <p>${bag.category || "No category"} - ${bag.color || "No color"}</p>
+        <p>${bag.category || "No category"} - ${(bag.variants || []).length || 1} color${((bag.variants || []).length || 1) === 1 ? "" : "s"}</p>
+        <div class="swatch-row">
+          ${(bag.variants || []).map((variant) => `
+            <span class="swatch" style="background:${variant.colorCode || "#d9ad5f"}" title="${variant.color || "Color"}"></span>
+          `).join("")}
+        </div>
         <p>${bag.tag || "No tag"}</p>
         <div class="bag-actions">
           <button type="button" data-edit-bag="${bag.id}">Edit</button>
@@ -88,11 +95,45 @@ function renderBags() {
   `).join("");
 }
 
+function newVariant() {
+  return {
+    id: "",
+    color: "",
+    colorCode: "#d9ad5f",
+    imageUrl: ""
+  };
+}
+
+function currentVariantsFromRows() {
+  return Array.from(variantList.querySelectorAll(".variant-row")).map((row) => ({
+    id: row.dataset.variantId || "",
+    color: row.querySelector("[data-variant-color]").value,
+    colorCode: row.querySelector("[data-variant-code]").value || "#d9ad5f",
+    imageUrl: row.dataset.imageUrl || ""
+  }));
+}
+
+function renderVariantEditor(variants = [newVariant()]) {
+  const rows = variants.length ? variants : [newVariant()];
+  variantList.innerHTML = rows.map((variant, index) => `
+    <div class="variant-row" data-variant-id="${variant.id || ""}" data-image-url="${variant.imageUrl || ""}">
+      <div class="variant-preview">
+        ${variant.imageUrl ? `<img src="${variant.imageUrl}" alt="${variant.color || "Bag color"}">` : `<span>No image</span>`}
+      </div>
+      <label>Color Name<input data-variant-color value="${variant.color || ""}" placeholder="Ivory, Black, Wine..."></label>
+      <label>Color Code<input data-variant-code type="color" value="${variant.colorCode || "#d9ad5f"}"></label>
+      <label>Image<input name="variantImage_${index}" type="file" accept="image/*"></label>
+      <button class="delete-button" type="button" data-remove-variant>Remove</button>
+    </div>
+  `).join("");
+}
+
 function resetBagForm() {
   bagForm.reset();
   bagForm.elements.id.value = "";
   bagForm.elements.visible.value = "1";
   bagForm.elements.sortOrder.value = "0";
+  renderVariantEditor();
 }
 
 loginForm.addEventListener("submit", async (event) => {
@@ -172,10 +213,12 @@ bagForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   bagNotice.textContent = "";
   const id = bagForm.elements.id.value;
+  const formData = new FormData(bagForm);
+  formData.set("variants", JSON.stringify(currentVariantsFromRows()));
   try {
     await request(id ? `/api/admin/bags/${id}` : "/api/admin/bags", {
       method: id ? "PUT" : "POST",
-      body: new FormData(bagForm)
+      body: formData
     });
     resetBagForm();
     bagNotice.textContent = "Bag saved.";
@@ -195,11 +238,16 @@ bagList.addEventListener("click", async (event) => {
     bagForm.elements.id.value = bag.id;
     bagForm.elements.name.value = bag.name || "";
     bagForm.elements.categoryId.value = categories.find((category) => category.slug === bag.categorySlug)?.id || "";
-    bagForm.elements.color.value = bag.color || "";
     bagForm.elements.tag.value = bag.tag || "";
     bagForm.elements.description.value = bag.description || "";
     bagForm.elements.sortOrder.value = bag.sort_order || 0;
-    bagForm.elements.visible.value = "1";
+    bagForm.elements.visible.value = bag.visible === 0 ? "0" : "1";
+    renderVariantEditor(bag.variants || [{
+      id: "",
+      color: bag.color || "",
+      colorCode: "#d9ad5f",
+      imageUrl: bag.imageUrl || ""
+    }]);
     bagForm.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
@@ -211,6 +259,25 @@ bagList.addEventListener("click", async (event) => {
 });
 
 clearBagForm.addEventListener("click", resetBagForm);
+
+addVariant.addEventListener("click", () => {
+  renderVariantEditor([...currentVariantsFromRows(), newVariant()]);
+});
+
+variantList.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-remove-variant]");
+  if (!button) return;
+  const variants = currentVariantsFromRows();
+  if (variants.length <= 1) {
+    renderVariantEditor();
+    return;
+  }
+  const index = Array.from(variantList.querySelectorAll(".variant-row")).indexOf(button.closest(".variant-row"));
+  variants.splice(index, 1);
+  renderVariantEditor(variants);
+});
+
+renderVariantEditor();
 
 request("/api/admin/me")
   .then(async (data) => {

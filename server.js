@@ -78,6 +78,13 @@ function defaultData() {
       tag: bag[3],
       description: bag[4],
       imageUrl: "/assets/catalog-bags.png",
+      variants: [{
+        id: crypto.randomBytes(4).toString("hex"),
+        color: bag[2],
+        colorCode: "#d9ad5f",
+        imageUrl: "/assets/catalog-bags.png",
+        sort_order: 1
+      }],
       sort_order: index + 1,
       visible: 1,
       created_at: new Date().toISOString(),
@@ -124,6 +131,13 @@ function readDb() {
       tag: "New Arrival",
       description: "A spacious tote for polished everyday carrying.",
       imageUrl: "/assets/catalog-bags.png",
+      variants: [{
+        id: crypto.randomBytes(4).toString("hex"),
+        color: "Soft cream",
+        colorCode: "#f5ead8",
+        imageUrl: "/assets/catalog-bags.png",
+        sort_order: 1
+      }],
       sort_order: 7,
       visible: 1,
       created_at: new Date().toISOString(),
@@ -132,6 +146,30 @@ function readDb() {
     data.nextBagId = nextBagId + 1;
     changed = true;
   }
+  data.bags.forEach((bag) => {
+    if (!Array.isArray(bag.variants) || !bag.variants.length) {
+      bag.variants = [{
+        id: crypto.randomBytes(4).toString("hex"),
+        color: bag.color || "Default",
+        colorCode: "#d9ad5f",
+        imageUrl: bag.imageUrl || "/assets/catalog-bags.png",
+        sort_order: 1
+      }];
+      changed = true;
+    }
+    bag.variants = bag.variants.map((variant, index) => ({
+      id: variant.id || crypto.randomBytes(4).toString("hex"),
+      color: variant.color || bag.color || `Color ${index + 1}`,
+      colorCode: /^#[0-9a-f]{6}$/i.test(variant.colorCode || "") ? variant.colorCode : "#d9ad5f",
+      imageUrl: variant.imageUrl || bag.imageUrl || "/assets/catalog-bags.png",
+      sort_order: Number(variant.sort_order || index + 1)
+    })).sort((a, b) => Number(a.sort_order) - Number(b.sort_order));
+    const primaryVariant = bag.variants[0];
+    if (primaryVariant) {
+      bag.color = primaryVariant.color;
+      bag.imageUrl = primaryVariant.imageUrl;
+    }
+  });
   if (changed) writeDb(data);
   return data;
 }
@@ -149,11 +187,68 @@ function attachCategory(data, bag) {
     tag: bag.tag,
     description: bag.description,
     imageUrl: bag.imageUrl,
+    variants: (bag.variants || []).map((variant) => ({
+      id: variant.id,
+      color: variant.color,
+      colorCode: variant.colorCode,
+      imageUrl: variant.imageUrl,
+      sort_order: variant.sort_order
+    })),
     sort_order: bag.sort_order,
     visible: bag.visible,
     category: category ? category.name : "",
     categorySlug: category ? category.slug : ""
   };
+}
+
+async function buildBagVariants(req, existingBag = null) {
+  let requestedVariants = [];
+  try {
+    requestedVariants = JSON.parse(req.body.variants || "[]");
+  } catch (error) {
+    requestedVariants = [];
+  }
+
+  const files = Array.isArray(req.files) ? req.files : [];
+  const existingVariants = Array.isArray(existingBag?.variants) ? existingBag.variants : [];
+
+  const variants = [];
+  for (const [index, item] of requestedVariants.entries()) {
+    const uploadFile = files.find((file) => file.fieldname === `variantImage_${index}`);
+    const uploadedUrl = await uploadBufferToCloudinary(uploadFile);
+    const existingVariant = existingVariants.find((variant) => variant.id === item.id);
+    const imageUrl = uploadedUrl || item.imageUrl || existingVariant?.imageUrl || existingBag?.imageUrl || "/assets/catalog-bags.png";
+    const color = String(item.color || "").trim();
+    if (!color && !imageUrl) continue;
+    variants.push({
+      id: item.id || crypto.randomBytes(4).toString("hex"),
+      color: color || `Color ${index + 1}`,
+      colorCode: /^#[0-9a-f]{6}$/i.test(item.colorCode || "") ? item.colorCode : "#d9ad5f",
+      imageUrl,
+      sort_order: index + 1
+    });
+  }
+
+  const legacyFile = files.find((file) => file.fieldname === "image");
+  if (!variants.length) {
+    const legacyUrl = await uploadBufferToCloudinary(legacyFile);
+    variants.push({
+      id: crypto.randomBytes(4).toString("hex"),
+      color: req.body.color || existingBag?.color || "Default",
+      colorCode: "#d9ad5f",
+      imageUrl: legacyUrl || existingBag?.imageUrl || "/assets/catalog-bags.png",
+      sort_order: 1
+    });
+  }
+
+  return variants;
+}
+
+function applyPrimaryVariant(bag) {
+  const primaryVariant = Array.isArray(bag.variants) ? bag.variants[0] : null;
+  if (!primaryVariant) return;
+  bag.color = primaryVariant.color;
+  bag.imageUrl = primaryVariant.imageUrl;
 }
 
 function publicPayload(includeHidden = false) {
@@ -192,7 +287,7 @@ function localUploadUrl(file) {
 }
 
 function uploadBufferToCloudinary(file) {
-  if (!file) return Promise.resolve("");
+  if (!file || file.size === 0) return Promise.resolve("");
   if (!cloudinaryEnabled) return Promise.resolve(localUploadUrl(file));
 
   return new Promise((resolve, reject) => {
@@ -311,25 +406,28 @@ app.delete("/api/admin/categories/:id", requireAdmin, (req, res) => {
   res.json(publicPayload(true));
 });
 
-app.post("/api/admin/bags", requireAdmin, upload.single("image"), async (req, res, next) => {
+app.post("/api/admin/bags", requireAdmin, upload.any(), async (req, res, next) => {
   try {
   const data = readDb();
   const name = String(req.body.name || "").trim();
   if (!name) return res.status(400).json({ error: "Bag name is required" });
-  const imageUrl = await uploadBufferToCloudinary(req.file);
-  data.bags.push({
+  const variants = await buildBagVariants(req);
+  const bag = {
     id: data.nextBagId++,
     name,
     category_id: req.body.categoryId ? Number(req.body.categoryId) : null,
-    color: req.body.color || "",
+    color: "",
     tag: req.body.tag || "",
     description: req.body.description || "",
-    imageUrl: imageUrl || "/assets/catalog-bags.png",
+    imageUrl: "",
+    variants,
     sort_order: Number(req.body.sortOrder || 0),
     visible: req.body.visible === "0" ? 0 : 1,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
-  });
+  };
+  applyPrimaryVariant(bag);
+  data.bags.push(bag);
   writeDb(data);
   res.json(publicPayload(true));
   } catch (error) {
@@ -337,18 +435,17 @@ app.post("/api/admin/bags", requireAdmin, upload.single("image"), async (req, re
   }
 });
 
-app.put("/api/admin/bags/:id", requireAdmin, upload.single("image"), async (req, res, next) => {
+app.put("/api/admin/bags/:id", requireAdmin, upload.any(), async (req, res, next) => {
   try {
   const data = readDb();
   const bag = data.bags.find((item) => item.id === Number(req.params.id));
   if (!bag) return res.status(404).json({ error: "Bag not found" });
   bag.name = req.body.name || "";
   bag.category_id = req.body.categoryId ? Number(req.body.categoryId) : null;
-  bag.color = req.body.color || "";
   bag.tag = req.body.tag || "";
   bag.description = req.body.description || "";
-  const imageUrl = await uploadBufferToCloudinary(req.file);
-  if (imageUrl) bag.imageUrl = imageUrl;
+  bag.variants = await buildBagVariants(req, bag);
+  applyPrimaryVariant(bag);
   bag.sort_order = Number(req.body.sortOrder || 0);
   bag.visible = req.body.visible === "0" ? 0 : 1;
   bag.updated_at = new Date().toISOString();
