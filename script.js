@@ -4,6 +4,7 @@ const categoryStrip = document.querySelector(".category-strip");
 const searchInput = document.querySelector("#searchInput");
 const menuToggle = document.querySelector(".menu-toggle");
 const mobilePanel = document.querySelector(".mobile-panel");
+const siteHeader = document.querySelector(".site-header");
 let activeFilter = "All";
 let products = [];
 let categories = [];
@@ -120,8 +121,14 @@ function closeMobileMenu() {
   mobilePanel.setAttribute("aria-hidden", "true");
 }
 
+function syncMobilePanelOffset() {
+  if (!siteHeader) return;
+  document.documentElement.style.setProperty("--header-offset", `${siteHeader.offsetHeight}px`);
+}
+
 menuToggle.addEventListener("click", (event) => {
   event.stopPropagation();
+  syncMobilePanelOffset();
   const isOpen = document.body.classList.toggle("nav-open");
   menuToggle.setAttribute("aria-expanded", String(isOpen));
   mobilePanel.setAttribute("aria-hidden", String(!isOpen));
@@ -131,27 +138,12 @@ document.querySelectorAll(".mobile-panel a").forEach((link) => {
   link.addEventListener("click", closeMobileMenu);
 });
 
-mobilePanel.addEventListener("click", (event) => {
-  event.stopPropagation();
-});
-
-document.addEventListener("click", (event) => {
-  if (!document.body.classList.contains("nav-open")) return;
-  if (mobilePanel.contains(event.target) || menuToggle.contains(event.target)) return;
-  closeMobileMenu();
-});
-
-document.addEventListener("touchstart", (event) => {
-  if (!document.body.classList.contains("nav-open")) return;
-  if (mobilePanel.contains(event.target) || menuToggle.contains(event.target)) return;
-  closeMobileMenu();
-}, { passive: true });
-
 window.addEventListener("scroll", () => {
   if (document.body.classList.contains("nav-open")) closeMobileMenu();
 }, { passive: true });
 
 window.addEventListener("resize", () => {
+  syncMobilePanelOffset();
   if (document.body.classList.contains("nav-open")) closeMobileMenu();
 });
 
@@ -160,3 +152,4 @@ document.querySelector(".search-toggle").addEventListener("click", () => {
 });
 
 loadCatalog();
+syncMobilePanelOffset();

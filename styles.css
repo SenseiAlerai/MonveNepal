@@ -10,6 +10,7 @@
   --gold: #d9ad5f;
   --gold-soft: #f3d58f;
   --night: #11100e;
+  --header-offset: 103px;
 }
 
 * { box-sizing: border-box; }
@@ -65,8 +66,8 @@ img { display: block; max-width: 100%; }
 }
 
 .logo-brand img {
-  width: clamp(148px, 18vw, 220px);
-  height: 58px;
+  width: clamp(178px, 22vw, 270px);
+  height: 72px;
   object-fit: contain;
   background: transparent;
 }
@@ -116,7 +117,7 @@ img { display: block; max-width: 100%; }
 .mobile-panel {
   display: none;
   position: fixed;
-  inset: 101px 0 auto 0;
+  inset: var(--header-offset) 0 auto 0;
   z-index: 18;
   background: var(--paper);
   border-bottom: 1px solid var(--border);
@@ -631,6 +632,7 @@ body.nav-open .mobile-panel {
 @media (max-width: 920px) {
   .site-header {
     grid-template-columns: auto 1fr auto;
+    min-height: var(--header-offset);
   }
 
   .menu-toggle { display: block; }
@@ -675,8 +677,8 @@ body.nav-open .mobile-panel {
 
   .brand { font-size: 22px; }
   .logo-brand img {
-    width: 142px;
-    height: 48px;
+    width: 174px;
+    height: 60px;
   }
   .inquiry-link { padding-inline: 10px; }
 
